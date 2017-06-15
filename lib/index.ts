@@ -6,6 +6,10 @@ export interface IDependentReducerFn<S> {
     (state: DeepReadonly<S>, action: Action<any>, ...dependenciesValues: DeepReadonly<any>[]): S;
 }
 
+export interface IStateShape {
+    [name: string]: DependentReducer<any>
+}
+
 export type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 }
@@ -47,9 +51,7 @@ export class DependentReducers<T> {
         return dependentReducer;
     }
 
-    public combine(stateShape: {
-                       [name: string]: DependentReducer<any>
-                   }): (state: T, action: Action<any>, ...otherParams: any[]) => T {
+    public combine(stateShape: IStateShape): (state: T, action: Action<any>, ...otherParams: any[]) => T {
         if (this.stateIdToKey) {
             throw new Error('Already initialized');
         }

@@ -3,6 +3,9 @@ export declare type IDependency<P> = ActionCreator<P> | DependentReducer<P>;
 export interface IDependentReducerFn<S> {
     (state: DeepReadonly<S>, action: Action<any>, ...dependenciesValues: DeepReadonly<any>[]): S;
 }
+export interface IStateShape {
+    [name: string]: DependentReducer<any>;
+}
 export declare type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
@@ -13,9 +16,7 @@ export declare class DependentReducers<T> {
     private stateIdToKey;
     private allDependencies;
     createDependency<S, A = any, D = any>(dependencies: (ActionCreator<any> | DependentReducer<any>)[], reducerFn: (state: DeepReadonly<S>, action: DeepReadonly<Action<A>>, ...dependenciesValues: DeepReadonly<D>[]) => S, initialState: S): DependentReducer<S>;
-    combine(stateShape: {
-        [name: string]: DependentReducer<any>;
-    }): (state: T, action: Action<any>, ...otherParams: any[]) => T;
+    combine(stateShape: IStateShape): (state: T, action: Action<any>, ...otherParams: any[]) => T;
 }
 export declare class DependentReducer<D> {
     private currentState;
