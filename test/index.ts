@@ -1,5 +1,5 @@
 import {test} from 'ava';
-import {createContainer} from "../lib/index";
+import {createContainer, IDependencyParams} from "../lib/index";
 import {Action} from "typescript-fsa";
 const fsa = require('typescript-fsa');
 
@@ -12,21 +12,32 @@ const minus = createAction('MINUS');
 const multiply = createAction('MULTIPLY');
 
 test('initial', t => {
-    const plusOrMinus = container.createDependency<number>([plus, minus], (state = 0, action) => {
-        if (isType(action, plus)) {
-            return state + action.payload;
-        } else if (isType(action, minus)) {
-            return state - action.payload;
-        }
-        return state;
-    }, 0);
+    const plusOrMinusDependencyParams: IDependencyParams<number, any, any> = {
+        dependencies: [plus, minus],
+        reducerFn: (state = 0, action) => {
+            if (isType(action, plus)) {
+                return state + action.payload;
+            } else if (isType(action, minus)) {
+                return state - action.payload;
+            }
+            return state;
+        },
+        initialState: 0
+    };
+    const plusOrMinus = container.createDependency(plusOrMinusDependencyParams);
 
-    const multiplyOrDivide = container.createDependency<number>([multiply], (state, action: Action<number>) => {
-        return state * action.payload;
-    }, 1);
+    const multiplyOrDivideDependencyParams: IDependencyParams<number, any, any> = {
+        dependencies: [multiply],
+        reducerFn: (state, action: Action<number>) => {
+            return state * action.payload;
+        },
+        initialState: 1
+    };
+    const multiplyOrDivide = container.createDependency(multiplyOrDivideDependencyParams);
 
-    const sumAllOperators = container.createDependency<number>([plusOrMinus, multiplyOrDivide],
-        (state, action, plusOrMinusValue: number, multiplyOrDivideValue: number) => {
+    const allOperatorsDependencyParams: IDependencyParams<number, any, any> = {
+        dependencies: [plusOrMinus, multiplyOrDivide],
+        reducerFn:  (state, action, plusOrMinusValue: number, multiplyOrDivideValue: number) => {
             if (state > 100) {
                 throw Error();
             }
@@ -36,7 +47,10 @@ test('initial', t => {
                 return state + multiplyOrDivideValue;
             }
             return state;
-        }, 0);
+        },
+        initialState: 0
+    };
+    const sumAllOperators = container.createDependency(allOperatorsDependencyParams);
 
     interface IState {
         plusOrMinus: number,
