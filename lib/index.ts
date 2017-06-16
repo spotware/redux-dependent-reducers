@@ -36,8 +36,8 @@ export class DependentReducers<T> {
     };
     private allDependencies: DependentReducer<any>[] = [];
 
-    public createDependency<S, A, D>(newDependencyParams: IDependencyParams<S, A, D>): DependentReducer<S> {
-        const {initialState, reducerFn, dependencies} = newDependencyParams;
+    public createDependency<S, A, D>(dependencyParams: IDependencyParams<S, A, D>): DependentReducer<S> {
+        const {initialState, reducerFn, dependencies} = dependencyParams;
         const dependentReducer = new DependentReducer<S>({
             initialState,
             reducerFn,

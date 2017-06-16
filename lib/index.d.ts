@@ -20,7 +20,7 @@ export declare class DependentReducers<T> {
     private idCounter;
     private stateIdToKey;
     private allDependencies;
-    createDependency<S, A, D>(newDependencyParams: IDependencyParams<S, A, D>): DependentReducer<S>;
+    createDependency<S, A, D>(dependencyParams: IDependencyParams<S, A, D>): DependentReducer<S>;
     combine(stateShape: IStateShape): (state: T, action: Action<any>, ...otherParams: any[]) => T;
 }
 export declare class DependentReducer<D> {
