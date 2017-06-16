@@ -10,6 +10,14 @@ export interface IStateShape {
     [name: string]: DependentReducer<any>
 }
 
+export interface IDependencyParams <S, A, D> {
+    dependencies: (ActionCreator<any> | DependentReducer<any>)[],
+    reducerFn: (state: DeepReadonly<S>,
+                action: DeepReadonly<Action<A>>,
+                ...dependenciesValues: DeepReadonly<D>[]) => S,
+    initialState: S
+}
+
 export type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 }
@@ -28,11 +36,8 @@ export class DependentReducers<T> {
     };
     private allDependencies: DependentReducer<any>[] = [];
 
-    public createDependency<S, A = any, D = any>(dependencies: (ActionCreator<any> | DependentReducer<any>)[],
-                                                 reducerFn: (state: DeepReadonly<S>,
-                                                             action: DeepReadonly<Action<A>>,
-                                                             ...dependenciesValues: DeepReadonly<D>[]) => S,
-                                                 initialState: S): DependentReducer<S> {
+    public createDependency<S, A, D>(dependencyParams: IDependencyParams<S, A, D>): DependentReducer<S> {
+        const {initialState, reducerFn, dependencies} = dependencyParams;
         const dependentReducer = new DependentReducer<S>({
             initialState,
             reducerFn,

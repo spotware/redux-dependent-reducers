@@ -6,6 +6,11 @@ export interface IDependentReducerFn<S> {
 export interface IStateShape {
     [name: string]: DependentReducer<any>;
 }
+export interface IDependencyParams<S, A, D> {
+    dependencies: (ActionCreator<any> | DependentReducer<any>)[];
+    reducerFn: (state: DeepReadonly<S>, action: DeepReadonly<Action<A>>, ...dependenciesValues: DeepReadonly<D>[]) => S;
+    initialState: S;
+}
 export declare type DeepReadonly<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
@@ -15,7 +20,7 @@ export declare class DependentReducers<T> {
     private idCounter;
     private stateIdToKey;
     private allDependencies;
-    createDependency<S, A = any, D = any>(dependencies: (ActionCreator<any> | DependentReducer<any>)[], reducerFn: (state: DeepReadonly<S>, action: DeepReadonly<Action<A>>, ...dependenciesValues: DeepReadonly<D>[]) => S, initialState: S): DependentReducer<S>;
+    createDependency<S, A, D>(dependencyParams: IDependencyParams<S, A, D>): DependentReducer<S>;
     combine(stateShape: IStateShape): (state: T, action: Action<any>, ...otherParams: any[]) => T;
 }
 export declare class DependentReducer<D> {
