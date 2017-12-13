@@ -1,6 +1,6 @@
 {
   "name": "redux-dependent-reducers",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Combine reducers dependent on evaluation order",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -24,10 +24,14 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "7.0.18",
+    "@types/lodash": "4.14.88",
     "ava": "0.19.1",
     "husky": "0.13.3",
     "redux": "3.6.0",
     "typescript": "2.3.2",
     "typescript-fsa": "2.0.0"
+  },
+  "dependencies": {
+    "lodash": "4.17.4"
   }
 }

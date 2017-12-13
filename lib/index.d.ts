@@ -21,7 +21,7 @@ export declare class DependentReducers<T> {
     private stateIdToKey;
     private allDependencies;
     createDependency<S, A, D>(dependencyParams: IDependencyParams<S, A, D>): DependentReducer<S>;
-    combine(stateShape: IStateShape): (state: T, action: Action<any>, ...otherParams: any[]) => T;
+    combine(stateShape: IStateShape, preloadedState?: Partial<any>): (state: T, action: Action<any>, ...otherParams: any[]) => T;
 }
 export declare class DependentReducer<D> {
     private currentState;
@@ -38,6 +38,7 @@ export declare class DependentReducer<D> {
     });
     getRootActionTypes(): string[];
     getCurrentState(): DeepReadonly<D>;
+    updateCurrentState(state: Partial<DeepReadonly<D>>): void;
     getPreviousState(): DeepReadonly<D>;
     run(action: Action<any>): DeepReadonly<D>;
 }

@@ -1,3 +1,4 @@
+import {merge} from 'lodash';
 import {Action, ActionCreator} from 'typescript-fsa';
 
 export type IDependency<P> = ActionCreator<P> | DependentReducer<P>;
@@ -56,7 +57,7 @@ export class DependentReducers<T> {
         return dependentReducer;
     }
 
-    public combine(stateShape: IStateShape): (state: T, action: Action<any>, ...otherParams: any[]) => T {
+    public combine(stateShape: IStateShape, preloadedState?: Partial<any>): (state: T, action: Action<any>, ...otherParams: any[]) => T {
         if (this.stateIdToKey) {
             throw new Error('Already initialized');
         }
@@ -69,7 +70,13 @@ export class DependentReducers<T> {
         this.allDependencies.forEach(dependency => {
             const key = this.stateIdToKey[dependency.id];
             if (key) {
-                initialState = {...initialState, [key]: dependency.getCurrentState()};
+                if (preloadedState) {
+                    dependency.updateCurrentState(preloadedState[key]);
+                }
+                initialState = {
+                    ...initialState,
+                    [key]: dependency.getCurrentState()
+                };
             }
         });
 
@@ -128,6 +135,14 @@ export class DependentReducer<D> {
 
     public getCurrentState(): DeepReadonly<D> {
         return this.currentState;
+    }
+
+    public updateCurrentState(state: Partial<DeepReadonly<D>>) {
+        if (typeof this.currentState === 'object') {
+            this.currentState = merge({}, this.currentState, state);
+        } else {
+            this.currentState = <any>state;
+        }
     }
 
     public getPreviousState(): DeepReadonly<D> {
