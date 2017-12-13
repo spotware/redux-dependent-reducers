@@ -1,17 +1,15 @@
 import {test} from 'ava';
 import {createContainer, IDependencyParams} from "../lib/index";
-import {Action} from "typescript-fsa";
-const fsa = require('typescript-fsa');
+import typescriptFsa, {Action, isType} from "typescript-fsa";
 
-const isType = fsa.isType;
-
-const container = createContainer();
-const createAction = fsa.default();
-const plus = createAction('PLUS');
-const minus = createAction('MINUS');
-const multiply = createAction('MULTIPLY');
+const actionCreator = typescriptFsa('TEST');
+const plus = actionCreator<number>('PLUS');
+const minus = actionCreator<number>('MINUS');
+const multiply = actionCreator<number>('MULTIPLY');
 
 test('initial', t => {
+    const container = createContainer();
+
     const plusOrMinusDependencyParams: IDependencyParams<number, any, any> = {
         dependencies: [plus, minus],
         reducerFn: (state = 0, action) => {
@@ -37,7 +35,7 @@ test('initial', t => {
 
     const allOperatorsDependencyParams: IDependencyParams<number, any, any> = {
         dependencies: [plusOrMinus, multiplyOrDivide],
-        reducerFn:  (state, action, plusOrMinusValue: number, multiplyOrDivideValue: number) => {
+        reducerFn: (state, action, plusOrMinusValue: number, multiplyOrDivideValue: number) => {
             if (state > 100) {
                 throw Error();
             }
@@ -51,12 +49,6 @@ test('initial', t => {
         initialState: 0
     };
     const sumAllOperators = container.createDependency(allOperatorsDependencyParams);
-
-    interface IState {
-        plusOrMinus: number,
-        multiplyOrDivide: number,
-        sumAllOperators: number,
-    }
 
     const reducer = container.combine({
         plusOrMinus,
@@ -83,5 +75,34 @@ test('initial', t => {
         // testing transactions
     }
     t.deepEqual(store.getState(), prevState);
+    t.pass();
+});
+
+test('preloadedState', t => {
+    const container = createContainer();
+
+    const emptyDependencyParams: IDependencyParams<number, any, any> = {
+        dependencies: [plus, minus],
+        reducerFn: (state = 0) => {
+            return state;
+        },
+        initialState: 0
+    };
+    const empty = container.createDependency(emptyDependencyParams);
+
+    const preloadedState = {
+        empty: 9,
+    };
+
+    const reducer = container.combine({
+        empty,
+    }, preloadedState);
+
+    const store = require('redux').createStore(reducer, {});
+
+    store.dispatch(plus(5));
+
+    t.deepEqual(store.getState(), preloadedState);
+
     t.pass();
 });
